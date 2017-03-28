@@ -1,2 +1,2 @@
 # fastInotifySync
-real-time inotify + Sync
+Real-Time Inotify + Sync
