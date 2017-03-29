@@ -63,8 +63,7 @@ class Inotify {
     }
 
     public function run() {
-        while (TRUE) {
-            echo microtime(), "\n";
+        swoole_event_add($this->inotify, function($inotify){
             $events = inotify_read($this->inotify);
             if ($events) {
                 var_dump($events);
@@ -76,6 +75,6 @@ class Inotify {
                 }
             }
             echo "\n=====\n";
-        }
+        });
     }
 }
