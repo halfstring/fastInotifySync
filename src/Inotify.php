@@ -1,5 +1,7 @@
 <?php
 
+namespace fastInotifySync;
+
 class Inotify {
     private $path;
     private $inotify   = NULL;
@@ -63,7 +65,7 @@ class Inotify {
     }
 
     public function run() {
-        swoole_event_add($this->inotify, function($inotify){
+        swoole_event_add($this->inotify, function($inotify) {
             $events = inotify_read($this->inotify);
             if ($events) {
                 var_dump($events);
