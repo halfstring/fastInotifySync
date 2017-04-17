@@ -1,5 +1,5 @@
 {
-  "name": "halfstring/fastInotifySync",
+  "name": "halfstring/fastinotifysync",
   "description": "Real-Time Inotify + Sync",
   "keywords": [
     "Inotify",
