@@ -2,12 +2,12 @@
 
 namespace fastInotifySync;
 
+use fastInotifySync;
+
 class Inotify {
-    private $path;
     private $inotify   = NULL;
     private $watchDirs = array();
     private $wds       = array();
-    private $callbacks = array();
 
     public function __construct() {
         $this->inotify = inotify_init();
@@ -52,31 +52,41 @@ class Inotify {
         return $this;
     }
 
-    public function registerCallback($callback, $params = array()) {
-        $key = md5(var_export($callback, TRUE));
-        if (!isset($this->callbacks[ $key ])) {
-            $this->callbacks[ $key ] = array(
-                'func'   => $callback,
-                'params' => $params
-            );
-        }
-
-        return $this;
-    }
-
     public function run() {
-        swoole_event_add($this->inotify, function($inotify) {
+        $timeLine = new TimeLine();
+        swoole_event_add($this->inotify, function($inotify) use ($timeLine) {
             $events = inotify_read($this->inotify);
             if ($events) {
-                var_dump($events);
+                $res = [];
                 foreach ($events as $event) {
-                    //$filepath = $this->wds[ $event['wd'] ] . '/' . $event['name'];
-                    //echo $filepath, "<---filepath=---\n";
-                    //echo md5_file($filepath), "<---filepath--md5=---\n";
-                    //echo "inotify Event :" . var_export($event, 1) . "\n";
+                    //var_dump($event);
+                    if (!preg_match('/\.swp|\.swx|~|4913$/', $event['name'])) {
+                        $file         = $this->_getDir($event['wd']) . '/' . $event['name'];
+                        $res[ $file ] = \md5_file($file);
+                    }
+                }
+
+                if (is_array($res)) {
+                    foreach ($res as $key => $value) {
+                        $timeLine->push(array(
+                            'file'   => $key,
+                            'finger' => $value
+                        ));
+                    }
                 }
             }
-            echo "\n=====\n";
         });
+    }
+
+    private function _getDir($wd) {
+        if (is_array($this->watchDirs)) {
+            foreach ($this->watchDirs as $item) {
+                if ($wd == $item['wd']) {
+                    return $item['path'];
+                }
+            }
+        }
+
+        return '';
     }
 }

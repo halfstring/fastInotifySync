@@ -1,11 +1,4 @@
 <?php
-require dirname(__DIR__) . '/vendor/autoload.php';
-
-$config  = require(dirname(__DIR__) . '/configs/main.php');
-$inotify = new \fastInotifySync\Inotify();
-$inotify->addDirs($config['watchDirs'])->run();
-
-
 
 $serv = new Swoole\Server("0.0.0.0", 1027);
 $serv->set(array(
